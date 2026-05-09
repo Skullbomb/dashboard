@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relax & Chill — Ruhi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+/* ══════════════════════════════════════════════
+   THEME TOKENS
+══════════════════════════════════════════════ */
+:root{
+  /* dark (default) */
+  --bg:         #05060F;
+  --bg2:        #0D0E1E;
+  --card:       rgba(18,21,46,0.82);
+  --card-solid: #12152E;
+  --text:       #E8E0FF;
+  --text2:      rgba(200,190,255,0.55);
+  --border:     rgba(107,78,255,0.22);
+  --purple:     #6B4EFF;
+  --violet:     #9D6FFF;
+  --pink:       #FF6B9D;
+  --cyan:       #4ECFFF;
+  --gold:       #FFD166;
+  --cream:      #F0E8FF;
+  --glass:      rgba(13,14,30,0.75);
+  --shadow:     0 8px 40px rgba(0,0,0,0.55);
+  --input-bg:   rgba(255,255,255,0.06);
+  --check-done: rgba(107,78,255,0.3);
+  --item-bg:    rgba(255,255,255,0.04);
+  --item-hover: rgba(107,78,255,0.1);
+  --scrollbar:  rgba(107,78,255,0.3);
+}
+[data-mode="light"]{
+  --bg:         #F5F0FF;
+  --bg2:        #EDE6FF;
+  --card:       rgba(255,255,255,0.88);
+  --card-solid: #FFFFFF;
+  --text:       #1A0A3A;
+  --text2:      rgba(80,50,140,0.55);
+  --border:     rgba(107,78,255,0.2);
+  --glass:      rgba(240,232,255,0.8);
+  --shadow:     0 8px 40px rgba(107,78,255,0.12);
+  --input-bg:   rgba(107,78,255,0.06);
+  --check-done: rgba(107,78,255,0.15);
+  --item-bg:    rgba(107,78,255,0.04);
+  --item-hover: rgba(107,78,255,0.1);
+  --scrollbar:  rgba(107,78,255,0.2);
+}
+
+/* ══════════════════════════════════════════════
+   BASE
+══════════════════════════════════════════════ */
+html,body{min-height:100vh;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);overflow-x:hidden;transition:background .4s,color .4s}
+
+/* Ambient background */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%,rgba(107,78,255,.1),transparent),
+    radial-gradient(ellipse 60% 45% at 85% 70%,rgba(255,107,157,.07),transparent),
+    radial-gradient(ellipse 40% 35% at 50% 50%,rgba(78,207,255,.05),transparent);
+  transition:opacity .4s;
+}
+[data-mode="light"] body::before{
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%,rgba(107,78,255,.07),transparent),
+    radial-gradient(ellipse 60% 45% at 85% 70%,rgba(255,107,157,.05),transparent);
+}
+
+/* canvas stars */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+[data-mode="light"] #bgCanvas{opacity:.25}
+
+/* ══════════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════════ */
+.page{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem 5rem}
+
+/* ══════════════════════════════════════════════
+   TOP NAV
+══════════════════════════════════════════════ */
+.topnav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 0 2rem;
+  animation:fadeUp .6s ease both;
+}
+.topnav-left{display:flex;align-items:center;gap:14px}
+.back-btn{
+  display:flex;align-items:center;gap:7px;padding:8px 16px;
+  border-radius:100px;border:1px solid var(--border);background:var(--glass);
+  color:var(--text2);font-size:12px;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .25s;backdrop-filter:blur(12px);text-decoration:none;
+}
+.back-btn:hover{color:var(--text);border-color:var(--violet);background:rgba(107,78,255,.15)}
+.nav-crumb{font-size:12px;color:var(--text2)}
+.nav-crumb span{color:var(--violet)}
+.topnav-right{display:flex;align-items:center;gap:10px}
+
+/* Dark/light toggle */
+.mode-toggle{
+  width:44px;height:44px;border-radius:50%;
+  border:1px solid var(--border);background:var(--glass);
+  color:var(--text);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;backdrop-filter:blur(12px);
+}
+.mode-toggle:hover{transform:rotate(18deg) scale(1.1);background:rgba(107,78,255,.2)}
+
+/* ══════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════ */
+.hero{
+  background:linear-gradient(135deg,rgba(107,78,255,.22),rgba(255,107,157,.14));
+  border:1px solid var(--border);border-radius:24px;
+  padding:2.5rem;margin-bottom:2.5rem;position:relative;overflow:hidden;
+  animation:fadeUp .7s .05s ease both;
+}
+.hero::after{
+  content:'✦';position:absolute;top:-10px;right:28px;
+  font-size:120px;color:rgba(107,78,255,.07);pointer-events:none;
+  font-family:'Cormorant Garamond',serif;line-height:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--violet);
+  background:rgba(107,78,255,.15);border:1px solid var(--border);
+  padding:5px 12px;border-radius:100px;margin-bottom:14px;
+}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:300;color:var(--cream);line-height:1.1;margin-bottom:6px}
+[data-mode="light"] .hero-title{color:var(--text)}
+.hero-title em{font-style:italic;color:var(--violet)}
+.hero-sub{font-size:13px;color:var(--text2)}
+
+/* ══════════════════════════════════════════════
+   MUSIC PLAYER
+══════════════════════════════════════════════ */
+.music-player{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.4rem 1.6rem;margin-bottom:2rem;
+  backdrop-filter:blur(18px);
+  animation:fadeUp .7s .1s ease both;
+  display:flex;flex-direction:column;gap:14px;
+}
+.music-header{display:flex;align-items:center;justify-content:space-between}
+.music-title-area{display:flex;align-items:center;gap:12px}
+.music-disc{
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  box-shadow:0 0 20px rgba(107,78,255,.4);
+  animation:spin 8s linear infinite paused;
+}
+.music-disc.playing{animation-play-state:running}
+.music-track{font-size:13.5px;font-weight:500;color:var(--text)}
+.music-artist{font-size:11px;color:var(--text2);margin-top:2px}
+.music-controls{display:flex;align-items:center;gap:10px}
+.mc-btn{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--border);background:transparent;
+  color:var(--text2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.mc-btn:hover{background:rgba(107,78,255,.2);color:var(--text);border-color:var(--violet)}
+.mc-btn.play{
+  width:44px;height:44px;font-size:18px;
+  background:var(--purple);color:white;border-color:var(--purple);
+  box-shadow:0 0 16px rgba(107,78,255,.4);
+}
+.mc-btn.play:hover{background:var(--violet)}
+
+/* Progress bar */
+.music-progress{display:flex;align-items:center;gap:10px}
+.prog-time{font-size:10px;color:var(--text2);font-family:'DM Sans',sans-serif;min-width:34px}
+.prog-bar{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:100px;cursor:pointer;position:relative;overflow:hidden}
+[data-mode="light"] .prog-bar{background:rgba(107,78,255,.12)}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .5s linear;pointer-events:none}
+.prog-bar:hover .prog-fill{background:linear-gradient(90deg,var(--violet),var(--pink))}
+
+/* Volume + upload row */
+.music-bottom{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.vol-row{display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.vol-row label{font-size:11px;color:var(--text2);white-space:nowrap}
+.vol-row input[type=range]{flex:1;accent-color:var(--purple);cursor:pointer;height:3px}
+.upload-label{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border:1px dashed var(--border);border-radius:100px;
+  font-size:11px;color:var(--text2);cursor:pointer;
+  transition:all .25s;white-space:nowrap;
+}
+.upload-label:hover{border-color:var(--violet);color:var(--violet);background:rgba(107,78,255,.08)}
+#musicUpload{display:none}
+
+/* Playlist */
+.playlist{display:flex;flex-direction:column;gap:4px;max-height:130px;overflow-y:auto;margin-top:4px}
+.pl-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:10px;
+  border:1px solid transparent;background:var(--item-bg);
+  cursor:pointer;transition:all .2s;
+  font-size:12.5px;color:var(--text2);
+}
+.pl-item:hover{background:var(--item-hover);border-color:var(--border);color:var(--text)}
+.pl-item.active{background:rgba(107,78,255,.18);border-color:var(--border);color:var(--violet)}
+.pl-item.active .pl-icon{animation:pulse 1.2s ease-in-out infinite}
+.pl-icon{font-size:14px;flex-shrink:0}
+.pl-name{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pl-del{
+  background:none;border:none;color:var(--text2);cursor:pointer;
+  font-size:15px;padding:0 4px;opacity:0;transition:opacity .2s;
+}
+.pl-item:hover .pl-del{opacity:1}
+
+/* ══════════════════════════════════════════════
+   SECTION LABEL
+══════════════════════════════════════════════ */
+.sec-label{
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--violet);margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:10px;opacity:.85;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);display:block}
+
+/* ══════════════════════════════════════════════
+   TRACKER GRID  (3 columns)
+══════════════════════════════════════════════ */
+.tracker-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.25rem;
+  margin-bottom:2.5rem;
+  animation:fadeUp .7s .15s ease both;
+}
+@media(max-width:780px){.tracker-grid{grid-template-columns:1fr}}
+
+/* Each tracker column */
+.tracker{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.4rem;backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;gap:0;
+  transition:border-color .25s;
+}
+.tracker:hover{border-color:rgba(107,78,255,.4)}
+
+.tracker-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;
+}
+.tracker-title{
+  display:flex;align-items:center;gap:9px;
+  font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:var(--cream);
+}
+[data-mode="light"] .tracker-title{color:var(--text)}
+.tracker-title .t-icon{font-size:1.4rem}
+.tracker-count{font-size:10px;letter-spacing:.1em;color:var(--text2);text-transform:uppercase;margin-top:3px}
+.tracker-edit-btn{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--border);background:transparent;
+  color:var(--text2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.tracker-edit-btn:hover{background:rgba(107,78,255,.15);border-color:var(--violet);color:var(--violet)}
+.tracker-edit-btn.active{background:rgba(107,78,255,.2);border-color:var(--purple);color:var(--purple)}
+
+/* Add form */
+.add-form{
+  display:flex;gap:7px;margin-bottom:10px;
+  max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .35s cubic-bezier(0.4,0,0.2,1),
+             opacity .3s ease,
+             margin .35s ease;
+}
+.add-form.open{max-height:60px;opacity:1;margin-bottom:10px}
+.add-input{
+  flex:1;padding:8px 12px;
+  border:1px solid var(--border);border-radius:10px;
+  background:var(--input-bg);font-family:'DM Sans',sans-serif;
+  font-size:12.5px;color:var(--text);outline:none;
+  transition:border .2s,background .3s;
+}
+.add-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(107,78,255,.12)}
+.add-input::placeholder{color:var(--text2)}
+.add-btn{
+  padding:8px 14px;background:var(--purple);color:white;
+  border:none;border-radius:10px;cursor:pointer;
+  font-size:14px;transition:all .2s;flex-shrink:0;
+}
+.add-btn:hover{background:var(--violet)}
+
+/* Items list */
+.items-list{
+  display:flex;flex-direction:column;gap:5px;
+  max-height:360px;overflow-y:auto;padding-right:2px;
+}
+.item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:11px;
+  border:1px solid var(--border);background:var(--item-bg);
+  transition:all .25s;
+  animation:slideIn .25s ease;
+}
+.item:hover{background:var(--item-hover);border-color:rgba(107,78,255,.35)}
+.item.done{opacity:.5}
+.item.done .item-name{text-decoration:line-through;color:var(--text2)}
+
+/* Checkbox */
+.item-check{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid var(--border);background:transparent;
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .22s;font-size:11px;color:transparent;
+}
+.item-check:hover{border-color:var(--purple);background:rgba(107,78,255,.1)}
+.item.done .item-check{
+  background:var(--check-done);border-color:var(--purple);
+  color:var(--violet);
+}
+.item-name{flex:1;font-size:13px;color:var(--text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.item-del{
+  background:none;border:none;color:var(--text2);cursor:pointer;
+  font-size:15px;padding:0 3px;opacity:0;transition:opacity .2s;flex-shrink:0;
+}
+.item:hover .item-del{opacity:1}
+.item-del:hover{color:var(--pink)}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:2rem 1rem;
+  font-size:12px;color:var(--text2);line-height:1.8;
+}
+.empty-state .e-icon{font-size:2rem;margin-bottom:8px;display:block;opacity:.6}
+
+/* Stats bar */
+.stats-bar{
+  display:flex;align-items:center;gap:10px;
+  margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);
+}
+.stat-pill{
+  flex:1;text-align:center;padding:6px 0;
+  background:var(--item-bg);border-radius:8px;border:1px solid var(--border);
+}
+.stat-pill .s-num{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--violet);font-weight:300}
+.stat-pill .s-lbl{font-size:9px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase}
+.progress-mini{height:3px;background:rgba(255,255,255,.06);border-radius:100px;margin-top:8px;overflow:hidden}
+[data-mode="light"] .progress-mini{background:rgba(107,78,255,.1)}
+.progress-mini-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .5s ease}
+
+/* ══════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════ */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:100px}
+
+/* ══════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════ */
+@keyframes fadeUp  {from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn {from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)}}
+@keyframes spin    {from{transform:rotate(0deg)} to{transform:rotate(360deg)}}
+@keyframes pulse   {0%,100%{opacity:1} 50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="page">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <div class="topnav-left">
+      <a class="back-btn" href="index.html">← Back to Hub</a>
+      <div class="nav-crumb">Home → <span>Relax & Chill</span></div>
+    </div>
+    <div class="topnav-right">
+      <button class="mode-toggle" id="modeBtn" onclick="toggleMode()" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🌙 Your cosy corner</div>
+    <div class="hero-title">Relax & <em>Chill</em></div>
+    <div class="hero-sub">Music, anime, manga, manhwa — your personal escape from med school 🌸</div>
+  </div>
+
+  <!-- MUSIC PLAYER -->
+  <div class="sec-label">🎵 Background Music</div>
+  <div class="music-player">
+    <div class="music-header">
+      <div class="music-title-area">
+        <div class="music-disc" id="musicDisc">🎵</div>
+        <div>
+          <div class="music-track" id="trackName">Take the Journey</div>
+          <div class="music-artist" id="trackArtist">Honkai: Star Rail OST</div>
+        </div>
+      </div>
+      <div class="music-controls">
+        <button class="mc-btn" onclick="prevTrack()" title="Previous">⏮</button>
+        <button class="mc-btn play" id="playPauseBtn" onclick="togglePlay()">▶</button>
+        <button class="mc-btn" onclick="nextTrack()" title="Next">⏭</button>
+        <button class="mc-btn" id="loopBtn" onclick="toggleLoop()" title="Loop">🔁</button>
+      </div>
+    </div>
+
+    <div class="music-progress">
+      <span class="prog-time" id="timeNow">0:00</span>
+      <div class="prog-bar" id="progBar" onclick="seekTo(event)">
+        <div class="prog-fill" id="progFill" style="width:0%"></div>
+      </div>
+      <span class="prog-time" id="timeTot">0:00</span>
+    </div>
+
+    <div class="music-bottom">
+      <div class="vol-row">
+        <label>Vol</label>
+        <input type="range" min="0" max="1" step="0.02" value="0.6" id="volSlider" oninput="setVol(this.value)">
+      </div>
+      <label class="upload-label" for="musicUpload">📁 Upload music file</label>
+      <input type="file" id="musicUpload" accept="audio/*" multiple onchange="handleUpload(event)">
+    </div>
+
+    <div class="playlist" id="playlist"></div>
+  </div>
+
+  <!-- TRACKERS -->
+  <div class="sec-label">📚 Watch & Read Tracker</div>
+  <div class="tracker-grid">
+
+    <!-- ANIME -->
+    <div class="tracker" id="tracker-anime">
+      <div class="tracker-header">
+        <div>
+          <div class="tracker-title"><span class="t-icon">🎌</span> Anime</div>
+          <div class="tracker-count" id="count-anime">0 titles</div>
+        </div>
+        <button class="tracker-edit-btn" id="editBtn-anime" onclick="toggleEdit('anime')" title="Add / edit">＋</button>
+      </div>
+      <div class="add-form" id="form-anime">
+        <input class="add-input" id="input-anime" placeholder="Add anime title…" onkeydown="if(event.key==='Enter')addItem('anime')">
+        <button class="add-btn" onclick="addItem('anime')">+</button>
+      </div>
+      <div class="items-list" id="list-anime"></div>
+      <div class="stats-bar" id="stats-anime"></div>
+    </div>
+
+    <!-- MANGA -->
+    <div class="tracker" id="tracker-manga">
+      <div class="tracker-header">
+        <div>
+          <div class="tracker-title"><span class="t-icon">📖</span> Manga</div>
+          <div class="tracker-count" id="count-manga">0 titles</div>
+        </div>
+        <button class="tracker-edit-btn" id="editBtn-manga" onclick="toggleEdit('manga')" title="Add / edit">＋</button>
+      </div>
+      <div class="add-form" id="form-manga">
+        <input class="add-input" id="input-manga" placeholder="Add manga title…" onkeydown="if(event.key==='Enter')addItem('manga')">
+        <button class="add-btn" onclick="addItem('manga')">+</button>
+      </div>
+      <div class="items-list" id="list-manga"></div>
+      <div class="stats-bar" id="stats-manga"></div>
+    </div>
+
+    <!-- MANHWA -->
+    <div class="tracker" id="tracker-manhwa">
+      <div class="tracker-header">
+        <div>
+          <div class="tracker-title"><span class="t-icon">🌸</span> Manhwa</div>
+          <div class="tracker-count" id="count-manhwa">0 titles</div>
+        </div>
+        <button class="tracker-edit-btn" id="editBtn-manhwa" onclick="toggleEdit('manhwa')" title="Add / edit">＋</button>
+      </div>
+      <div class="add-form" id="form-manhwa">
+        <input class="add-input" id="input-manhwa" placeholder="Add manhwa title…" onkeydown="if(event.key==='Enter')addItem('manhwa')">
+        <button class="add-btn" onclick="addItem('manhwa')">+</button>
+      </div>
+      <div class="items-list" id="list-manhwa"></div>
+      <div class="stats-bar" id="stats-manhwa"></div>
+    </div>
+
+  </div>
+</div><!-- /page -->
+
+<script>
+/* ══════════════════════════════════════════════
+   CANVAS STARS
+══════════════════════════════════════════════ */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let stars2 = [];
+function resizeC(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  stars2 = Array.from({length:150},()=>({
+    x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+    r:Math.random()*1.4+.2,t:Math.random()*Math.PI*2,
+    ts:Math.random()*.02+.004,s:Math.random()*.08+.01,
+    c:['#9D6FFF','#FF6B9D','#4ECFFF'][Math.floor(Math.random()*3)]
+  }));
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars2.forEach(s=>{
+    s.t+=s.ts; s.y-=s.s;
+    if(s.y<-2){s.y=canvas.height+2;s.x=Math.random()*canvas.width}
+    const a=.35+Math.sin(s.t)*.5;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=s.c+(Math.round(a*255).toString(16).padStart(2,'0'));
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize',resizeC);
+resizeC(); drawStars();
+
+/* ══════════════════════════════════════════════
+   DARK / LIGHT MODE
+══════════════════════════════════════════════ */
+const savedMode = localStorage.getItem('ruhi_relax_mode') || 'dark';
+document.documentElement.setAttribute('data-mode', savedMode);
+document.getElementById('modeBtn').textContent = savedMode === 'dark' ? '☀️' : '🌙';
+
+function toggleMode(){
+  const cur = document.documentElement.getAttribute('data-mode');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-mode', next);
+  document.getElementById('modeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('ruhi_relax_mode', next);
+}
+
+/* ══════════════════════════════════════════════
+   MUSIC PLAYER
+══════════════════════════════════════════════ */
+let audio = new Audio();
+let playlist = [];
+let curIdx = 0;
+let isPlaying = false;
+let isLooping = false;
+
+// Default: HSR Take the Journey via YouTube proxy (open audio)
+// We use a royalty-free HSR-style ambient as placeholder since direct HSR audio needs local file
+// We generate a tone-based ambient sound via Web Audio as "Take the Journey" placeholder
+let synthAudioCtx = null;
+let synthNodes = [];
+
+function createHSRAmbient() {
+  if (synthAudioCtx) return;
+  synthAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const masterGain = synthAudioCtx.createGain();
+  masterGain.gain.value = 0.18;
+  masterGain.connect(synthAudioCtx.destination);
+
+  // Pad chords — ethereal HSR-like
+  const chords = [
+    [261.63, 329.63, 392.00, 523.25], // C maj
+    [293.66, 369.99, 440.00, 587.33], // D maj
+    [246.94, 311.13, 369.99, 493.88], // B min
+    [220.00, 277.18, 329.63, 440.00], // A min
+  ];
+  let chordIdx = 0;
+  let chordNodes = [];
+
+  function playChord() {
+    chordNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    chordNodes = [];
+    const c = chords[chordIdx % chords.length];
+    chordIdx++;
+    c.forEach(freq => {
+      const osc = synthAudioCtx.createOscillator();
+      const g = synthAudioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0, synthAudioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(0.12, synthAudioCtx.currentTime + 1.5);
+      g.gain.linearRampToValueAtTime(0.08, synthAudioCtx.currentTime + 3.5);
+      g.gain.linearRampToValueAtTime(0, synthAudioCtx.currentTime + 5.5);
+      osc.connect(g); g.connect(masterGain);
+      osc.start(); osc.stop(synthAudioCtx.currentTime + 6);
+      chordNodes.push(osc);
+    });
+    // Melody note
+    const mel = synthAudioCtx.createOscillator();
+    const melGain = synthAudioCtx.createGain();
+    mel.type = 'triangle';
+    mel.frequency.value = c[2] * 2;
+    melGain.gain.setValueAtTime(0, synthAudioCtx.currentTime);
+    melGain.gain.linearRampToValueAtTime(0.09, synthAudioCtx.currentTime + 0.4);
+    melGain.gain.linearRampToValueAtTime(0, synthAudioCtx.currentTime + 2.5);
+    mel.connect(melGain); melGain.connect(masterGain);
+    mel.start(); mel.stop(synthAudioCtx.currentTime + 3);
+    chordNodes.push(mel);
+  }
+
+  let timer;
+  function loop() { playChord(); timer = setTimeout(loop, 5800); }
+  loop();
+  synthNodes = [masterGain];
+  synthNodes._timer = timer;
+  synthNodes._stop = () => {
+    clearTimeout(timer);
+    chordNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    masterGain.disconnect();
+  };
+}
+
+function stopHSRAmbient() {
+  if (synthNodes._stop) { synthNodes._stop(); synthAudioCtx = null; synthNodes = []; }
+}
+
+// Default "HSR" track entry
+const DEFAULT_TRACK = { name: 'Take the Journey', artist: 'Honkai: Star Rail OST', type: 'synth', url: null };
+playlist.push(DEFAULT_TRACK);
+
+// User uploaded tracks
+let uploadedTracks = JSON.parse(localStorage.getItem('ruhi_playlist_meta') || '[]');
+// Note: actual audio blobs can't persist in localStorage — only names
+uploadedTracks.forEach(t => playlist.push({ name: t.name, artist: 'Uploaded', type: 'uploaded', url: null }));
+
+function renderPlaylist() {
+  const el = document.getElementById('playlist');
+  el.innerHTML = '';
+  playlist.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'pl-item' + (i === curIdx ? ' active' : '');
+    div.innerHTML = `<span class="pl-icon">${i === curIdx && isPlaying ? '▶' : '🎵'}</span>
+      <span class="pl-name">${t.name}${t.artist !== 'Honkai: Star Rail OST' ? ' · ' + t.artist : ''}</span>
+      ${i > 0 ? `<button class="pl-del" onclick="removeTrack(${i},event)">×</button>` : ''}`;
+    div.onclick = () => { if(event.target.classList.contains('pl-del')) return; switchTrack(i); };
+    el.appendChild(div);
+  });
+}
+
+function switchTrack(i) {
+  curIdx = i;
+  const t = playlist[i];
+  document.getElementById('trackName').textContent = t.name;
+  document.getElementById('trackArtist').textContent = t.artist;
+  if (t.type === 'synth') {
+    audio.pause(); audio.src = '';
+    if (!isPlaying) { createHSRAmbient(); isPlaying = true; }
+    else { stopHSRAmbient(); createHSRAmbient(); }
+  } else if (t.type === 'file' && t.url) {
+    stopHSRAmbient();
+    audio.src = t.url;
+    audio.loop = isLooping;
+    if (isPlaying) audio.play();
+  } else {
+    // uploaded but no blob in memory — prompt
+    isPlaying = false;
+    document.getElementById('playPauseBtn').textContent = '▶';
+  }
+  updatePlayBtn();
+  renderPlaylist();
+}
+
+function togglePlay() {
+  const t = playlist[curIdx];
+  if (t.type === 'synth') {
+    if (isPlaying) { stopHSRAmbient(); isPlaying = false; }
+    else { createHSRAmbient(); isPlaying = true; }
+  } else if (t.type === 'file' && t.url) {
+    if (isPlaying) { audio.pause(); isPlaying = false; }
+    else { audio.play(); isPlaying = true; }
+  }
+  updatePlayBtn();
+  renderPlaylist();
+}
+
+function updatePlayBtn() {
+  const disc = document.getElementById('musicDisc');
+  const btn  = document.getElementById('playPauseBtn');
+  btn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) disc.classList.add('playing');
+  else disc.classList.remove('playing');
+}
+
+function prevTrack() { curIdx = (curIdx - 1 + playlist.length) % playlist.length; switchTrack(curIdx); }
+function nextTrack() { curIdx = (curIdx + 1) % playlist.length; switchTrack(curIdx); }
+
+function toggleLoop() {
+  isLooping = !isLooping;
+  audio.loop = isLooping;
+  document.getElementById('loopBtn').style.opacity = isLooping ? '1' : '0.5';
+}
+
+function setVol(v) {
+  audio.volume = parseFloat(v);
+  if (synthAudioCtx && synthNodes[0]) {
+    try { synthNodes[0].gain.value = parseFloat(v) * 0.3; } catch(e) {}
+  }
+}
+
+// Progress bar (for real audio only)
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('timeNow').textContent = fmtTime(audio.currentTime);
+  document.getElementById('timeTot').textContent = fmtTime(audio.duration);
+});
+audio.addEventListener('ended', () => { if (!isLooping) nextTrack(); });
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function seekTo(e) {
+  const bar = document.getElementById('progBar');
+  const pct = e.offsetX / bar.offsetWidth;
+  if (audio.duration) audio.currentTime = pct * audio.duration;
+}
+
+// Animate synth progress bar
+let synthStart = null;
+const SYNTH_DUR = 240; // 4 min loop display
+function animSynth(ts) {
+  if (!isPlaying || playlist[curIdx].type !== 'synth') { synthStart = null; return; }
+  if (!synthStart) synthStart = ts;
+  const elapsed = (ts - synthStart) / 1000;
+  const pct = Math.min((elapsed % SYNTH_DUR) / SYNTH_DUR * 100, 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('timeNow').textContent = fmtTime(elapsed % SYNTH_DUR);
+  document.getElementById('timeTot').textContent = fmtTime(SYNTH_DUR);
+  requestAnimationFrame(animSynth);
+}
+const origToggle = togglePlay;
+// patch to start anim
+function togglePlay() {
+  origToggle();
+  if (isPlaying && playlist[curIdx].type === 'synth') requestAnimationFrame(animSynth);
+}
+
+function handleUpload(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(f => {
+    const url = URL.createObjectURL(f);
+    const name = f.name.replace(/\.[^.]+$/,'');
+    playlist.push({ name, artist: 'Uploaded', type: 'file', url });
+  });
+  renderPlaylist();
+}
+
+function removeTrack(i, ev) {
+  ev.stopPropagation();
+  if (i === curIdx) { nextTrack(); }
+  playlist.splice(i, 1);
+  if (curIdx >= playlist.length) curIdx = playlist.length - 1;
+  renderPlaylist();
+}
+
+renderPlaylist();
+
+/* ══════════════════════════════════════════════
+   TRACKER DATA
+══════════════════════════════════════════════ */
+const DEFAULT_DATA = {
+  anime: [
+    { name: 'Honkai: Star Rail (Series)', done: true },
+    { name: 'Frieren: Beyond Journey\'s End', done: false },
+    { name: 'Vinland Saga', done: false },
+    { name: 'Mushishi', done: false },
+  ],
+  manga: [
+    { name: 'Berserk', done: false },
+    { name: 'Vagabond', done: false },
+    { name: 'Dungeon Meshi', done: true },
+  ],
+  manhwa: [
+    { name: 'Solo Leveling', done: true },
+    { name: 'Tower of God', done: false },
+    { name: 'The Beginning After the End', done: false },
+  ]
+};
+
+let data = JSON.parse(localStorage.getItem('ruhi_tracker') || JSON.stringify(DEFAULT_DATA));
+let editOpen = { anime: false, manga: false, manhwa: false };
+
+function saveData() { localStorage.setItem('ruhi_tracker', JSON.stringify(data)); }
+
+function renderTracker(type) {
+  const list  = document.getElementById(`list-${type}`);
+  const cnt   = document.getElementById(`count-${type}`);
+  const stats = document.getElementById(`stats-${type}`);
+  const items = data[type] || [];
+  const done  = items.filter(i => i.done).length;
+  const total = items.length;
+
+  cnt.textContent = `${total} title${total !== 1 ? 's' : ''} · ${done} completed`;
+
+  list.innerHTML = '';
+  if (!total) {
+    list.innerHTML = `<div class="empty-state"><span class="e-icon">✦</span>No titles yet — hit <strong>＋</strong> to add one!</div>`;
+  } else {
+    items.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'item' + (item.done ? ' done' : '');
+      div.innerHTML = `
+        <div class="item-check" onclick="toggleItem('${type}',${i})">${item.done ? '✓' : ''}</div>
+        <span class="item-name">${escHtml(item.name)}</span>
+        <button class="item-del" onclick="deleteItem('${type}',${i})">×</button>`;
+      list.appendChild(div);
+    });
+  }
+
+  // Stats bar
+  const pct = total ? (done / total * 100) : 0;
+  stats.innerHTML = `
+    <div class="stat-pill"><div class="s-num">${total}</div><div class="s-lbl">Total</div></div>
+    <div class="stat-pill"><div class="s-num">${done}</div><div class="s-lbl">Done</div></div>
+    <div class="stat-pill"><div class="s-num">${total - done}</div><div class="s-lbl">Left</div></div>
+    <div style="flex:1.5">
+      <div style="font-size:9.5px;color:var(--text2);margin-bottom:4px;letter-spacing:.08em">${Math.round(pct)}% complete</div>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width:${pct}%"></div></div>
+    </div>`;
+}
+
+function toggleEdit(type) {
+  editOpen[type] = !editOpen[type];
+  const form = document.getElementById(`form-${type}`);
+  const btn  = document.getElementById(`editBtn-${type}`);
+  form.classList.toggle('open', editOpen[type]);
+  btn.classList.toggle('active', editOpen[type]);
+  btn.textContent = editOpen[type] ? '✕' : '＋';
+  if (editOpen[type]) setTimeout(() => document.getElementById(`input-${type}`).focus(), 50);
+}
+
+function addItem(type) {
+  const inp = document.getElementById(`input-${type}`);
+  const val = inp.value.trim();
+  if (!val) return;
+  data[type].push({ name: val, done: false });
+  inp.value = '';
+  saveData();
+  renderTracker(type);
+}
+
+function toggleItem(type, i) {
+  data[type][i].done = !data[type][i].done;
+  saveData();
+  renderTracker(type);
+}
+
+function deleteItem(type, i) {
+  data[type].splice(i, 1);
+  saveData();
+  renderTracker(type);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+['anime','manga','manhwa'].forEach(renderTracker);
+</script>
+</body>
+</html>
